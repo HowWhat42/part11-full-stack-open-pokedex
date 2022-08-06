@@ -33,3 +33,6 @@ jobs:
                 heroku_api_key: ${{secrets.HEROKU_API_KEY}}
                 heroku_app_name: 'pokedex-fsopen'
                 heroku_email: ${{secrets.HEROKU_EMAIL}}
+                healthcheck: 'https://pokedex-fsopen.herokuapp.com/health'
+                delay: 5
+                checkstring: 'ok'

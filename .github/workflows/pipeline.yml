@@ -33,12 +33,12 @@ jobs:
             - name: notify build failed
               uses: rjstone/discord-webhook-notify@1.0.0
               if: ${{ failure() }}
-                with:
-                  severity: error
-                  text: 'Build failed'
-                  description: commit ${{github.event.head_commit.url}} by ${{github.event.head_commit.committer.username}} broke the build :(
-                  webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-                  avatarUrl: https://avatars.githubusercontent.com/${{github.event.head_commit.committer.username}}
+              with:
+                severity: error
+                text: 'Build failed'
+                description: commit ${{github.event.head_commit.url}} by ${{github.event.head_commit.committer.username}} broke the build :(
+                webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+                avatarUrl: https://avatars.githubusercontent.com/${{github.event.head_commit.committer.username}}
             - name: deploy
               if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
               uses: akhileshns/heroku-deploy@v3.12.12
@@ -53,12 +53,12 @@ jobs:
             - name: notify deploy succeeded
               uses: rjstone/discord-webhook-notify@1.0.0
               if: ${{ success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
-                with:
-                  severity: info
-                  text: 'A new version of pokedex deployed'
-                  description: to https://pokedex-fsopen.herokuapp.com/ by ${{github.event.head_commit.committer.username}}
-                  webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-                  avatarUrl: https://avatars.githubusercontent.com/${{github.event.head_commit.committer.username}}
+              with:
+                severity: info
+                text: 'A new version of pokedex deployed'
+                description: to https://pokedex-fsopen.herokuapp.com/ by ${{github.event.head_commit.committer.username}}
+                webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+                avatarUrl: https://avatars.githubusercontent.com/${{github.event.head_commit.committer.username}}
 
     tag_release:
         needs: [simple_deployment_pipeline]

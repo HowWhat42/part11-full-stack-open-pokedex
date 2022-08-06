@@ -30,8 +30,17 @@ jobs:
                 command: npm run test:e2e
                 start: npm run start-prod
                 wait-on: http://localhost:5000
+            - name: notify build failed
+              uses: rjstone/discord-webhook-notify@89b0bf43c2c8514f70d0dcba4a706b904e8a3112
+              if: ${{ failure() }}
+              with:
+                severity: error
+                text: 'Build failed'
+                description: commit ${{github.event.head_commit.url}} by ${{github.event.head_commit.committer.username}} broke the build :(
+                webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+                avatarUrl: https://avatars.githubusercontent.com/${{github.event.head_commit.committer.username}}
             - name: deploy
-              if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip'}}
+              if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
               uses: akhileshns/heroku-deploy@v3.12.12
               with:
                 heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -41,14 +50,23 @@ jobs:
                 delay: 5
                 checkstring: 'ok'
                 rollbackonhealthcheckfailed: true
+            - name: notify deploy succeeded
+              uses: rjstone/discord-webhook-notify@89b0bf43c2c8514f70d0dcba4a706b904e8a3112
+              if: ${{ success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
+              with:
+                severity: info
+                text: 'A new version of pokedex deployed'
+                description: to https://pokedex-fsopen.herokuapp.com/ by ${{github.event.head_commit.committer.username}}
+                webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+                avatarUrl: https://avatars.githubusercontent.com/${{github.event.head_commit.committer.username}}
 
     tag_release:
         needs: [simple_deployment_pipeline]
         runs-on: ubuntu-20.04
         steps:
             - name: Bump version and push tag
-              if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip'}}
-              uses: anothrNick/github-tag-action@1.36.0
+              if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message),'#skip') }}
+              uses: anothrNick/github-tag-action@eca2b69f9e2c24be7decccd0f15fdb1ea5906598
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 DEFAULT_BUMP: patch

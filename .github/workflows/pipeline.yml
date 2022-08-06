@@ -36,3 +36,4 @@ jobs:
                 healthcheck: 'https://pokedex-fsopen.herokuapp.com/health'
                 delay: 5
                 checkstring: 'ok'
+                rollbackonhealthcheckfailed: true
